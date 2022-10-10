@@ -1,0 +1,38 @@
+{
+  "name": "euler-staking",
+  "version": "1.0.0",
+  "description": "Euler staking contracts based on Synthetix",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/euler-xyz/euler-staking.git"
+  },
+  "keywords": [],
+  "author": "Euler Labs",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/euler-xyz/euler-staking/issues"
+  },
+  "homepage": "https://github.com/euler-xyz/euler-staking#readme",
+  "dependencies": {
+    "@eulerxyz/euler-sdk": "^0.2.4-beta.3",
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@uniswap/v3-periphery": "1.4.1",
+    "@uniswap/v3-sdk": "^3.8.2",
+    "chai": "^4.3.4",
+    "ethers": "^5.4.1"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-etherscan": "^3.1.0",
+    "dotenv": "^10.0.0",
+    "ethereum-waffle": "^3.3.0",
+    "euler-contracts": "github:euler-xyz/euler-contracts",
+    "hardhat": "^2.7.0",
+    "hardhat-dependency-compiler": "^1.1.2",
+    "solidity-coverage": "^0.7.20"
+  }
+}
