@@ -11,6 +11,8 @@ import "./Pausable.sol";
 // Internal references
 import "./Utils.sol";
 
+// Original contract can be found under the following link:
+// https://github.com/Synthetixio/synthetix/blob/master/contracts/StakingRewards.sol
 contract StakingRewards is IStakingRewards, RewardsDistributionRecipient, ReentrancyGuard, Pausable {
     /* ========== STATE VARIABLES ========== */
     

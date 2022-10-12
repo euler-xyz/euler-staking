@@ -5,6 +5,8 @@ pragma solidity ^0.8.0;
 // Inheritance
 import "./Owned.sol";
 
+// Original contract can be found under the following link:
+// https://github.com/Synthetixio/synthetix/blob/master/contracts/RewardsDistributionRecipient.sol
 abstract contract RewardsDistributionRecipient is Owned {
     address public rewardsDistribution;
 

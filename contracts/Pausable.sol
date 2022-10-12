@@ -5,6 +5,8 @@ pragma solidity ^0.8.0;
 // Inheritance
 import "./Owned.sol";
 
+// Original contract can be found under the following link:
+// https://github.com/Synthetixio/synthetix/blob/master/contracts/Pausable.sol
 abstract contract Pausable is Owned {
     uint public lastPauseTime;
     bool public paused;

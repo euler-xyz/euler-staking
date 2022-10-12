@@ -9,6 +9,8 @@ import "./interfaces/IRewardsDistribution.sol";
 // Internal references
 import "./interfaces/IERC20.sol";
 
+// Original contract can be found under the following link:
+// https://github.com/Synthetixio/synthetix/blob/master/contracts/RewardsDistribution.sol
 contract RewardsDistribution is Owned, IRewardsDistribution {
     /**
      * @notice Authorised address able to call distributeRewards
