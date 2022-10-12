@@ -3,6 +3,17 @@ require("@nomiclabs/hardhat-etherscan");
 require('hardhat-dependency-compiler');
 require('dotenv').config();
 
+const fs = require("fs");
+
+// Load tasks
+
+const files = fs.readdirSync('./tasks');
+
+for (let file of files) {
+    if (!file.endsWith('.js')) continue;
+    require(`./tasks/${file}`);
+}
+
 // Config
 let accounts = process.env.PRV_KEY ? { accounts: [process.env.PRV_KEY] } : {};
 
