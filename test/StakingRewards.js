@@ -178,7 +178,7 @@ et.testSet({
             }
         },
 
-        { action: 'jumpTimeAndMine', time: 7 * A_DAY + 1000, },
+        { action: 'jumpTimeAndMine', time: 14 * A_DAY + 1000, },
         { call: 'stakingRewards.lastTimeRewardApplicable', 
             onResult: async (r) => {
                 et.expect(r).to.equal(ctx.cache);
@@ -199,7 +199,7 @@ et.testSet({
         { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
         { action: 'jumpTimeAndMine', time: A_DAY, },
 
-        { call: 'stakingRewards.rewardPerToken', equals: [et.BN(A_DAY).mul(et.eth('1')).div(7 * A_DAY).mul(et.eth('1')).div(et.eth('2')), 1e-4] },
+        { call: 'stakingRewards.rewardPerToken', equals: [et.BN(A_DAY).mul(et.eth('1')).div(14 * A_DAY).mul(et.eth('1')).div(et.eth('2')), 1e-4] },
     ]
 })
 
@@ -254,17 +254,17 @@ et.testSet({
 
         { from: ctx.wallet3, send: 'stakingRewards.stake', args: [et.eth('5')], },
         { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
-        { call: 'stakingRewards.rewardRate', equals: [et.eth('1').div(7 * A_DAY), 1e-6] },
+        { call: 'stakingRewards.rewardRate', equals: [et.eth('1').div(14 * A_DAY), 1e-6] },
         { call: 'stakingRewards.getRewardForDuration', equals: [et.eth('1'), 1e-6] },
         { action: 'jumpTimeAndMine', time: A_DAY, },
 
         { call: 'stakingRewards.earned', args: [ctx.wallet3.address], 
-            equals:  [et.eth('5').mul(et.BN(A_DAY)).mul(et.eth('1')).div(7 * A_DAY).mul(et.eth('1')).div(et.eth('5')).div(et.eth('1')), 1e-4]
+            equals:  [et.eth('5').mul(et.BN(A_DAY)).mul(et.eth('1')).div(14 * A_DAY).mul(et.eth('1')).div(et.eth('5')).div(et.eth('1')), 1e-4]
         },
 
         { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
-        { call: 'stakingRewards.rewardRate', equals: [et.eth('1').div(7 * A_DAY).mul(6 * A_DAY).add(et.eth('1')).div(7 * A_DAY), 1e-4] },
-        { call: 'stakingRewards.getRewardForDuration', equals: [et.eth('1').div(7 * A_DAY).mul(6 * A_DAY).add(et.eth('1')), 1e-4] },
+        { call: 'stakingRewards.rewardRate', equals: [et.eth('1').div(14 * A_DAY).mul(13 * A_DAY).add(et.eth('1')).div(14 * A_DAY), 1e-4] },
+        { call: 'stakingRewards.getRewardForDuration', equals: [et.eth('1').div(14 * A_DAY).mul(13 * A_DAY).add(et.eth('1')), 1e-4] },
     ]
 })
 
@@ -275,13 +275,13 @@ et.testSet({
         { from: ctx.wallet3, send: 'stakingRewards.stake', args: [et.eth('5')], },
 
         { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
-        { action: 'jumpTimeAndMine', time: 7 * A_DAY, },
+        { action: 'jumpTimeAndMine', time: 14 * A_DAY, },
 
         { call: 'stakingRewards.earned', args: [ctx.wallet3.address], 
         },
 
         { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
-        { action: 'jumpTimeAndMine', time: 7 * A_DAY, },
+        { action: 'jumpTimeAndMine', time: 14 * A_DAY, },
 
         { call: 'stakingRewards.earned', args: [ctx.wallet3.address], 
             equals:  [et.eth('2'), 1e-4]
@@ -304,7 +304,7 @@ et.testSet({
         },
 
         { from: ctx.wallet3, send: 'stakingRewards.stake', args: [et.eth('5')], },        
-        { call: 'stakingRewards.rewardRate', equals: [et.eth('1').div(7 * A_DAY), 1e-6] },
+        { call: 'stakingRewards.rewardRate', equals: [et.eth('1').div(14 * A_DAY), 1e-6] },
         { action: 'jumpTimeAndMine', time: A_DAY, },
 
         { call: 'tokens.TST.balanceOf', args: [ctx.wallet3.address], assertEql: 0 },
@@ -315,12 +315,12 @@ et.testSet({
                 et.expect(logs[0].args.user).to.equal(ctx.wallet3.address);
 
                 const tolerance = ethers.utils.parseEther('' + 1e-4);
-                const difference = logs[0].args.reward.sub(et.eth('1').div(7)).abs();
+                const difference = logs[0].args.reward.sub(et.eth('1').div(14)).abs();
                 if (difference.gt(tolerance)) et.assert(false);
             }
         },
-        { call: 'tokens.TST.balanceOf', args: [ctx.wallet3.address], equal: [et.eth('1').div(7), 1e-4] },
-        { call: 'tokens.TST.balanceOf', args: [ctx.contracts.stakingRewards.address], equal: [et.eth('1').mul(6).div(7), 1e-4] },
+        { call: 'tokens.TST.balanceOf', args: [ctx.wallet3.address], equal: [et.eth('1').div(14), 1e-4] },
+        { call: 'tokens.TST.balanceOf', args: [ctx.contracts.stakingRewards.address], equal: [et.eth('1').mul(6).div(14), 1e-4] },
     ]
 })
 
@@ -377,12 +377,12 @@ et.testSet({
                 et.expect(logs[1].name).to.equal('RewardPaid');
                 et.expect(logs[1].args.user).to.equal(ctx.wallet3.address);
 
-                difference = logs[1].args.reward.sub(et.eth('1').div(7)).abs();
+                difference = logs[1].args.reward.sub(et.eth('1').div(14)).abs();
                 if (difference.gt(tolerance)) et.assert(false);
             }
         },
-        { call: 'tokens.TST.balanceOf', args: [ctx.wallet3.address], equal: [et.eth('1').div(7), 1e-4] },
-        { call: 'tokens.TST.balanceOf', args: [ctx.contracts.stakingRewards.address], equal: [et.eth('1').mul(6).div(7), 1e-4] },
+        { call: 'tokens.TST.balanceOf', args: [ctx.wallet3.address], equal: [et.eth('1').div(14), 1e-4] },
+        { call: 'tokens.TST.balanceOf', args: [ctx.contracts.stakingRewards.address], equal: [et.eth('1').mul(6).div(14), 1e-4] },
         { call: 'eTokens.eTST.balanceOf', args: [ctx.wallet3.address], equal: [et.eth('100'), 1e-4] },
         { call: 'eTokens.eTST.balanceOf', args: [ctx.contracts.stakingRewards.address], equal: [et.eth('0'), 1e-4] },
     ]
@@ -391,7 +391,7 @@ et.testSet({
 .test({
     desc: "set rewards duration",
     actions: ctx => [
-        { call: 'stakingRewards.rewardsDuration', assertEql: 7 * A_DAY },
+        { call: 'stakingRewards.rewardsDuration', assertEql: 14 * A_DAY },
 
         { send: 'stakingRewards.setRewardsDuration', args: [3 * A_DAY], 
             onLogs: logs => {
