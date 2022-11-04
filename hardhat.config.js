@@ -26,12 +26,20 @@ module.exports = {
             url: process.env.MAINNET_JSON_RPC_URL,
             ...accounts,
         },
+        goerli: {
+            url: process.env.GOERLI_JSON_RPC_URL,
+            ...accounts,
+        },
+    },
+
+    etherscan: {
+        apiKey: process.env.ETHERSCAN_API_KEY,
     },
 
     solidity: {
         compilers: [
             {
-                version: "0.8.6",
+                version: "0.8.10",
                 settings: {
                     optimizer: {
                         enabled: true,
