@@ -23,17 +23,17 @@ module.exports = {
             hardfork: 'london',
         },
         mainnet: {
-            url: process.env.MAINNET_JSON_RPC_URL,
+            url: process.env.MAINNET_JSON_RPC_URL || "",
             ...accounts,
         },
         goerli: {
-            url: process.env.GOERLI_JSON_RPC_URL,
+            url: process.env.GOERLI_JSON_RPC_URL || "",
             ...accounts,
         },
     },
 
     etherscan: {
-        apiKey: process.env.ETHERSCAN_API_KEY,
+        apiKey: process.env.ETHERSCAN_API_KEY || "",
     },
 
     solidity: {
