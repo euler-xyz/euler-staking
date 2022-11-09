@@ -1,4 +1,6 @@
 {
     "rewardsDistribution": "0xa2b55ff55faad195e8663fa73f5e3d011c08daee",
-    "stakingRewards_eUSDC": "0xe427b8ac99d30d4e63e7b1141fe972d0c707b0b4"
+    "stakingRewards_eUSDC": "0xe427b8ac99d30d4e63e7b1141fe972d0c707b0b4",
+    "stakingRewards_eUSDT": "0xB3cAB5fE25E5fd401e0Cd042E9AA0efd5F516Db1",
+    "stakingRewards_eWBTC": "0x503F0Ab0325fd4dD89DE083D3974d12B2b1D9858"
 }
