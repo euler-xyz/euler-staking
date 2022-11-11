@@ -114,7 +114,7 @@ et.testSet({
     desc: "should have Pausable functionality",
     actions: ctx => [
         { from: ctx.wallet3, send: 'eTokens.eTST.approve', args: [ctx.contracts.stakingRewards.address, et.MaxUint256], },
-        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [et.eth('1')], },
+        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [0, et.eth('1')], },
 
         { from: ctx.wallet, send: 'stakingRewards.setPaused', args: [true], 
             onLogs: logs => {
@@ -122,7 +122,7 @@ et.testSet({
                 et.expect(logs[0].args.isPaused).to.equal(true);
             }
         },
-        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [et.eth('1')], 
+        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [0, et.eth('1')], 
             expectError: "This action cannot be performed while the contract is paused",
         },
 
@@ -132,7 +132,7 @@ et.testSet({
                 et.expect(logs[0].args.isPaused).to.equal(false);
             }
         },
-        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [et.eth('1')], },
+        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [0, et.eth('1')], },
     ]
 })
 
@@ -193,7 +193,7 @@ et.testSet({
         { call: 'stakingRewards.rewardPerToken', assertEql: 0 },
 
         { from: ctx.wallet3, send: 'eTokens.eTST.approve', args: [ctx.contracts.stakingRewards.address, et.MaxUint256], },
-        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [et.eth('2')], },
+        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [0, et.eth('2')], },
         { call: 'stakingRewards.totalSupply', assertEql: et.eth('2') },
 
         { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
@@ -208,7 +208,8 @@ et.testSet({
     actions: ctx => [
         { from: ctx.wallet3, send: 'eTokens.eTST.approve', args: [ctx.contracts.stakingRewards.address, et.MaxUint256], },
         { from: ctx.wallet4, send: 'eTokens.eTST.approve', args: [ctx.contracts.stakingRewards.address, et.MaxUint256], },
-        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [0], expectError: 'Cannot stake 0',},
+        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [0, 0], expectError: 'Cannot stake 0',},
+        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [256, 1], expectError: 'Sub-account id too big',},
 
         { call: 'eTokens.eTST.balanceOf', args: [ctx.wallet3.address], equals:  [et.eth('100'), 1e-6] },
         { call: 'eTokens.eTST.balanceOf', args: [ctx.wallet4.address], equals:  [et.eth('100'), 1e-6] },
@@ -216,7 +217,7 @@ et.testSet({
         { call: 'stakingRewards.balanceOf', args: [ctx.wallet4.address], assertEql:  et.eth('0') },
         { call: 'stakingRewards.totalSupply', assertEql: et.eth('0') },
 
-        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [et.eth('1')], 
+        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [0, et.eth('1')], 
             onLogs: logs => {
                 et.expect(logs[0].name).to.equal('Staked');
                 et.expect(logs[0].args.user).to.equal(ctx.wallet3.address);
@@ -230,7 +231,7 @@ et.testSet({
         { call: 'stakingRewards.balanceOf', args: [ctx.wallet4.address], assertEql:  et.eth('0') },
         { call: 'stakingRewards.totalSupply', equals:  [et.eth('1'), 1e-6] },
 
-        { from: ctx.wallet4, send: 'stakingRewards.stake', args: [et.eth('5')], 
+        { from: ctx.wallet4, send: 'stakingRewards.stake', args: [0, et.eth('5')], 
             onLogs: logs => {
                 et.expect(logs[0].name).to.equal('Staked');
                 et.expect(logs[0].args.user).to.equal(ctx.wallet4.address);
@@ -252,7 +253,7 @@ et.testSet({
         { from: ctx.wallet3, send: 'eTokens.eTST.approve', args: [ctx.contracts.stakingRewards.address, et.MaxUint256], },
         { call: 'stakingRewards.earned', args: [ctx.wallet3.address], assertEql: 0 },
 
-        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [et.eth('5')], },
+        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [0, et.eth('5')], },
         { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
         { call: 'stakingRewards.rewardRate', equals: [et.eth('1').div(14 * A_DAY), 1e-6] },
         { call: 'stakingRewards.getRewardForDuration', equals: [et.eth('1'), 1e-6] },
@@ -272,7 +273,7 @@ et.testSet({
     desc: "earnings roll over after rewardsDuration",
     actions: ctx => [
         { from: ctx.wallet3, send: 'eTokens.eTST.approve', args: [ctx.contracts.stakingRewards.address, et.MaxUint256], },
-        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [et.eth('5')], },
+        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [0, et.eth('5')], },
 
         { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
         { action: 'jumpTimeAndMine', time: 14 * A_DAY, },
@@ -303,7 +304,7 @@ et.testSet({
             }
         },
 
-        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [et.eth('5')], },        
+        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [0, et.eth('5')], },        
         { call: 'stakingRewards.rewardRate', equals: [et.eth('1').div(14 * A_DAY), 1e-6] },
         { action: 'jumpTimeAndMine', time: A_DAY, },
 
@@ -328,14 +329,15 @@ et.testSet({
     desc: "withdrawal",
     actions: ctx => [
         { from: ctx.wallet3, send: 'eTokens.eTST.approve', args: [ctx.contracts.stakingRewards.address, et.MaxUint256], },
-        { from: ctx.wallet3, send: 'stakingRewards.withdraw', args: [0], expectError: 'Cannot withdraw 0' },
-        { from: ctx.wallet3, send: 'stakingRewards.withdraw', args: [1], expectError: 'panic code 0x11' },
+        { from: ctx.wallet3, send: 'stakingRewards.withdraw', args: [0, 0], expectError: 'Cannot withdraw 0' },
+        { from: ctx.wallet3, send: 'stakingRewards.withdraw', args: [0, 1], expectError: 'panic code 0x11' },
+        { from: ctx.wallet3, send: 'stakingRewards.withdraw', args: [256, 1], expectError: 'Sub-account id too big' },
 
-        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [et.eth('5')], },
+        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [0, et.eth('5')], },
         { call: 'eTokens.eTST.balanceOf', args: [ctx.wallet3.address], equal: [et.eth('95'), 1e-4] },
         { call: 'eTokens.eTST.balanceOf', args: [ctx.contracts.stakingRewards.address], equal: [et.eth('5'), 1e-4] },
 
-        { from: ctx.wallet3, send: 'stakingRewards.withdraw', args: [et.eth('2')],
+        { from: ctx.wallet3, send: 'stakingRewards.withdraw', args: [0, et.eth('2')],
             onLogs: logs => {
                 et.expect(logs[0].name).to.equal('Withdrawn');
                 et.expect(logs[0].args.user).to.equal(ctx.wallet3.address);
@@ -355,9 +357,9 @@ et.testSet({
     actions: ctx => [
         { from: ctx.wallet3, send: 'eTokens.eTST.approve', args: [ctx.contracts.stakingRewards.address, et.MaxUint256], },
         { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
-        { from: ctx.wallet3, send: 'stakingRewards.exit', expectError: 'Cannot withdraw 0' },
+        { from: ctx.wallet3, send: 'stakingRewards.exit', args:[0], expectError: 'Cannot withdraw 0' },
 
-        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [et.eth('5')], },
+        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [0, et.eth('5')], },
         { action: 'jumpTimeAndMine', time: A_DAY, },
 
         { call: 'tokens.TST.balanceOf', args: [ctx.wallet3.address], assertEql: 0 },
@@ -365,7 +367,8 @@ et.testSet({
         { call: 'eTokens.eTST.balanceOf', args: [ctx.wallet3.address], equal: [et.eth('95'), 1e-4] },
         { call: 'eTokens.eTST.balanceOf', args: [ctx.contracts.stakingRewards.address], equal: [et.eth('5'), 1e-4] },
 
-        { from: ctx.wallet3, send: 'stakingRewards.exit',
+        { from: ctx.wallet3, send: 'stakingRewards.exit', args:[256], expectError: 'Sub-account id too big' },
+        { from: ctx.wallet3, send: 'stakingRewards.exit', args:[0],
             onLogs: logs => {
                 et.expect(logs[0].name).to.equal('Withdrawn');
                 et.expect(logs[0].args.user).to.equal(ctx.wallet3.address);
@@ -464,8 +467,8 @@ et.testSet({
         { from: ctx.wallet5, send: 'eTokens.eTST.approve', args: [ctx.contracts.stakingRewards.address, et.MaxUint256], },
 
         // two wallets stake the same amount
-        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [et.eth('1')], },
-        { from: ctx.wallet4, send: 'stakingRewards.stake', args: [et.eth('1')], },
+        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [0, et.eth('1')], },
+        { from: ctx.wallet4, send: 'stakingRewards.stake', args: [0, et.eth('1')], },
 
         { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
         
@@ -480,8 +483,8 @@ et.testSet({
 
         // third wallet comes in the middle of the rewards duration. second wallet adds to the stake
         { action: 'jumpTimeAndMine', time: 2 * A_DAY, },
-        { from: ctx.wallet4, send: 'stakingRewards.stake', args: [et.eth('1')], },
-        { from: ctx.wallet5, send: 'stakingRewards.stake', args: [et.eth('2')], },
+        { from: ctx.wallet4, send: 'stakingRewards.stake', args: [0, et.eth('1')], },
+        { from: ctx.wallet5, send: 'stakingRewards.stake', args: [0, et.eth('2')], },
 
         { action: 'jumpTimeAndMine', time: 5 * A_DAY, },
         { call: 'stakingRewards.earned', args: [ctx.wallet3.address], equals: [et.eth('0.35'), 1e-4] },
@@ -489,7 +492,7 @@ et.testSet({
         { call: 'stakingRewards.earned', args: [ctx.wallet5.address], equals: [et.eth('0.20'), 1e-4] },
 
         // first wallet leaves, new period begins
-        { from: ctx.wallet3, send: 'stakingRewards.exit', },
+        { from: ctx.wallet3, send: 'stakingRewards.exit', args:[0], },
         { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
         { action: 'jumpTimeAndMine', time: 10 * A_DAY, },
 
@@ -498,8 +501,8 @@ et.testSet({
         { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
         
         { action: 'jumpTimeAndMine', time: 10 * A_DAY, },
-        { from: ctx.wallet4, send: 'stakingRewards.exit', },
-        { from: ctx.wallet5, send: 'stakingRewards.exit', },
+        { from: ctx.wallet4, send: 'stakingRewards.exit', args:[0], },
+        { from: ctx.wallet5, send: 'stakingRewards.exit', args:[0], },
         { call: 'tokens.TST.balanceOf', args: [ctx.wallet3.address], equal: [et.eth('0.35'), 1e-4] },
         { call: 'tokens.TST.balanceOf', args: [ctx.wallet4.address], equal: [et.eth('1.45'), 1e-4] },
         { call: 'tokens.TST.balanceOf', args: [ctx.wallet5.address], equal: [et.eth('1.20'), 1e-4] },
@@ -507,6 +510,79 @@ et.testSet({
         { call: 'eTokens.eTST.balanceOf', args: [ctx.wallet3.address], equal: [et.eth('100'), 1e-4] },
         { call: 'eTokens.eTST.balanceOf', args: [ctx.wallet4.address], equal: [et.eth('100'), 1e-4] },
         { call: 'eTokens.eTST.balanceOf', args: [ctx.wallet5.address], equal: [et.eth('100'), 1e-4] },
+        { call: 'eTokens.eTST.balanceOf', args: [ctx.contracts.stakingRewards.address], equal: [et.eth('0'), 1e-4] },
+    ]
+})
+
+.test({
+    desc: "integration test with sub-accounts",
+    actions: ctx => [
+        { from: ctx.wallet3, send: 'eTokens.eTST.transfer', args: [et.getSubAccount(ctx.wallet3.address, 1), et.eth('50')], },
+        { from: ctx.wallet4, send: 'eTokens.eTST.transfer', args: [et.getSubAccount(ctx.wallet4.address, 2), et.eth('50')], },
+        { from: ctx.wallet5, send: 'eTokens.eTST.transfer', args: [et.getSubAccount(ctx.wallet5.address, 3), et.eth('50')], },
+        { call: 'eTokens.eTST.balanceOf', args: [et.getSubAccount(ctx.wallet3.address, 0)], equal: [et.eth('50'), 1e-4] },
+        { call: 'eTokens.eTST.balanceOf', args: [et.getSubAccount(ctx.wallet4.address, 0)], equal: [et.eth('50'), 1e-4] },
+        { call: 'eTokens.eTST.balanceOf', args: [et.getSubAccount(ctx.wallet5.address, 0)], equal: [et.eth('50'), 1e-4] },
+        { call: 'eTokens.eTST.balanceOf', args: [et.getSubAccount(ctx.wallet3.address, 1)], equal: [et.eth('50'), 1e-4] },
+        { call: 'eTokens.eTST.balanceOf', args: [et.getSubAccount(ctx.wallet4.address, 2)], equal: [et.eth('50'), 1e-4] },
+        { call: 'eTokens.eTST.balanceOf', args: [et.getSubAccount(ctx.wallet5.address, 3)], equal: [et.eth('50'), 1e-4] },
+
+        { send: 'stakingRewards.setRewardsDuration', args: [10 * A_DAY], },
+        { from: ctx.wallet3, send: 'eTokens.eTST.approveSubAccount', args: [0, ctx.contracts.stakingRewards.address, et.MaxUint256], },
+        { from: ctx.wallet4, send: 'eTokens.eTST.approveSubAccount', args: [0, ctx.contracts.stakingRewards.address, et.MaxUint256], },
+        { from: ctx.wallet5, send: 'eTokens.eTST.approveSubAccount', args: [0, ctx.contracts.stakingRewards.address, et.MaxUint256], },
+        { from: ctx.wallet3, send: 'eTokens.eTST.approveSubAccount', args: [1, ctx.contracts.stakingRewards.address, et.MaxUint256], },
+        { from: ctx.wallet4, send: 'eTokens.eTST.approveSubAccount', args: [2, ctx.contracts.stakingRewards.address, et.MaxUint256], },
+        { from: ctx.wallet5, send: 'eTokens.eTST.approveSubAccount', args: [3, ctx.contracts.stakingRewards.address, et.MaxUint256], },
+
+        // two wallets stake the same amount
+        { from: ctx.wallet3, send: 'stakingRewards.stake', args: [1, et.eth('1')], },
+        { from: ctx.wallet4, send: 'stakingRewards.stake', args: [2, et.eth('1')], },
+
+        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
+        
+        // they should earn the same amount
+        { action: 'jumpTimeAndMine', time: A_DAY, },
+        { call: 'stakingRewards.earned', args: [ctx.wallet3.address], equals: [et.eth('1').div(10).div(2), 1e-4] },
+        { call: 'stakingRewards.earned', args: [ctx.wallet4.address], equals: [et.eth('1').div(10).div(2), 1e-4] },
+
+        { action: 'jumpTimeAndMine', time: 2 * A_DAY, },
+        { call: 'stakingRewards.earned', args: [ctx.wallet3.address], equals: [et.eth('1').div(10).mul(3).div(2), 1e-4] },
+        { call: 'stakingRewards.earned', args: [ctx.wallet4.address], equals: [et.eth('1').div(10).mul(3).div(2), 1e-4] },
+
+        // third wallet comes in the middle of the rewards duration. second wallet adds to the stake from different sub-account
+        { action: 'jumpTimeAndMine', time: 2 * A_DAY, },
+        { from: ctx.wallet4, send: 'stakingRewards.stake', args: [0, et.eth('1')], },
+        { from: ctx.wallet5, send: 'stakingRewards.stake', args: [3, et.eth('2')], },
+
+        { action: 'jumpTimeAndMine', time: 5 * A_DAY, },
+        { call: 'stakingRewards.earned', args: [ctx.wallet3.address], equals: [et.eth('0.35'), 1e-4] },
+        { call: 'stakingRewards.earned', args: [ctx.wallet4.address], equals: [et.eth('0.45'), 1e-4] },
+        { call: 'stakingRewards.earned', args: [ctx.wallet5.address], equals: [et.eth('0.20'), 1e-4] },
+
+        // first wallet leaves, new period begins
+        { from: ctx.wallet3, send: 'stakingRewards.exit', args:[0], },
+        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
+        { action: 'jumpTimeAndMine', time: 10 * A_DAY, },
+
+        // second wallet gets rewards, new period begins
+        { from: ctx.wallet4, send: 'stakingRewards.getReward', },
+        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
+        
+        { action: 'jumpTimeAndMine', time: 10 * A_DAY, },
+        { from: ctx.wallet4, send: 'stakingRewards.exit', args:[1], },
+        { from: ctx.wallet5, send: 'stakingRewards.exit', args:[5], },
+        { call: 'tokens.TST.balanceOf', args: [ctx.wallet3.address], equal: [et.eth('0.35'), 1e-4] },
+        { call: 'tokens.TST.balanceOf', args: [ctx.wallet4.address], equal: [et.eth('1.45'), 1e-4] },
+        { call: 'tokens.TST.balanceOf', args: [ctx.wallet5.address], equal: [et.eth('1.20'), 1e-4] },
+        { call: 'tokens.TST.balanceOf', args: [ctx.contracts.stakingRewards.address], equal: [et.eth('0'), 1e-4] },
+        { call: 'eTokens.eTST.balanceOf', args: [et.getSubAccount(ctx.wallet3.address, 0)], equal: [et.eth('51'), 1e-4] },
+        { call: 'eTokens.eTST.balanceOf', args: [et.getSubAccount(ctx.wallet4.address, 0)], equal: [et.eth('49'), 1e-4] },
+        { call: 'eTokens.eTST.balanceOf', args: [et.getSubAccount(ctx.wallet5.address, 0)], equal: [et.eth('50'), 1e-4] },
+        { call: 'eTokens.eTST.balanceOf', args: [et.getSubAccount(ctx.wallet3.address, 1)], equal: [et.eth('49'), 1e-4] },
+        { call: 'eTokens.eTST.balanceOf', args: [et.getSubAccount(ctx.wallet4.address, 2)], equal: [et.eth('51'), 1e-4] },
+        { call: 'eTokens.eTST.balanceOf', args: [et.getSubAccount(ctx.wallet5.address, 3)], equal: [et.eth('48'), 1e-4] },
+        { call: 'eTokens.eTST.balanceOf', args: [et.getSubAccount(ctx.wallet5.address, 3)], equal: [et.eth('52'), 1e-4] },
         { call: 'eTokens.eTST.balanceOf', args: [ctx.contracts.stakingRewards.address], equal: [et.eth('0'), 1e-4] },
     ]
 })

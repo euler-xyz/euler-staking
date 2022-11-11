@@ -19,4 +19,9 @@ library Utils {
         (bool success, bytes memory data) = token.call(abi.encodeWithSelector(IERC20.approve.selector, to, value));
         require(success && (data.length == 0 || abi.decode(data, (bool))), string(data));
     }
+
+    function getSubAccount(address primary, uint subAccountId) internal pure returns (address) {
+        require(subAccountId < 256, "Sub-account id too big");
+        return address(uint160(primary) ^ uint160(subAccountId));
+    }
 }
