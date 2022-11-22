@@ -16,3 +16,4 @@ This repo contains the staking smart contracts based on [Synthetix](https://gith
 3. In `RewardsDistribution.sol` got rid of `RewardEscrow` and `FeePoolProxy` references along as related functionalities
 4. In `StakingRewards.sol` used own safe transfer functions instead of keeping OpenZeppelin dependencies
 5. In `IRewardsDistribution.sol` and `IStakingRewards.sol` removed unnecessary view functions for public variables
+6. Added Euler sub-accounts support in `stake()`, `withdraw()` and `exit()` functions of `StakingRewards.sol`

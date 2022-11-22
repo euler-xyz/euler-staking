@@ -74,19 +74,25 @@ contract StakingRewards is IStakingRewards, RewardsDistributionRecipient, Reentr
 
     /* ========== MUTATIVE FUNCTIONS ========== */
 
-    function stake(uint256 amount) external override nonReentrant notPaused updateReward(msg.sender) {
+    function stake(uint subAccountId, uint256 amount) external override nonReentrant notPaused updateReward(msg.sender) {
         require(amount > 0, "Cannot stake 0");
+
+        address from = Utils.getSubAccount(msg.sender, subAccountId);
         _totalSupply = _totalSupply + amount;
         _balances[msg.sender] = _balances[msg.sender] + amount;
-        Utils.safeTransferFrom(stakingToken, msg.sender, address(this), amount);
+        
+        Utils.safeTransferFrom(stakingToken, from, address(this), amount);
         emit Staked(msg.sender, amount);
     }
 
-    function withdraw(uint256 amount) public override nonReentrant updateReward(msg.sender) {
+    function withdraw(uint subAccountId, uint256 amount) public override nonReentrant updateReward(msg.sender) {
         require(amount > 0, "Cannot withdraw 0");
+
+        address to = Utils.getSubAccount(msg.sender, subAccountId);
         _totalSupply = _totalSupply - amount;
         _balances[msg.sender] = _balances[msg.sender] - amount;
-        Utils.safeTransfer(stakingToken, msg.sender, amount);
+
+        Utils.safeTransfer(stakingToken, to, amount);
         emit Withdrawn(msg.sender, amount);
     }
 
@@ -99,8 +105,8 @@ contract StakingRewards is IStakingRewards, RewardsDistributionRecipient, Reentr
         }
     }
 
-    function exit() external override {
-        withdraw(_balances[msg.sender]);
+    function exit(uint subAccountId) external override {
+        withdraw(subAccountId, _balances[msg.sender]);
         getReward();
     }
 
