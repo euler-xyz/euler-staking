@@ -169,7 +169,7 @@ et.testSet({
     actions: ctx => [
         { call: 'stakingRewards.lastTimeRewardApplicable', assertEql: 0 },
 
-        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
+        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', },
 
         { call: 'stakingRewards.lastTimeRewardApplicable', 
             onResult: async (r) => {
@@ -196,7 +196,7 @@ et.testSet({
         { from: ctx.wallet3, send: 'stakingRewards.stake', args: [0, et.eth('2')], },
         { call: 'stakingRewards.totalSupply', assertEql: et.eth('2') },
 
-        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
+        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards',},
         { action: 'jumpTimeAndMine', time: A_DAY, },
 
         { call: 'stakingRewards.rewardPerToken', equals: [et.BN(A_DAY).mul(et.eth('1')).div(14 * A_DAY).mul(et.eth('1')).div(et.eth('2')), 1e-4] },
@@ -254,7 +254,7 @@ et.testSet({
         { call: 'stakingRewards.earned', args: [ctx.wallet3.address], assertEql: 0 },
 
         { from: ctx.wallet3, send: 'stakingRewards.stake', args: [0, et.eth('5')], },
-        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
+        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', },
         { call: 'stakingRewards.rewardRate', equals: [et.eth('1').div(14 * A_DAY), 1e-6] },
         { call: 'stakingRewards.getRewardForDuration', equals: [et.eth('1'), 1e-6] },
         { action: 'jumpTimeAndMine', time: A_DAY, },
@@ -263,7 +263,7 @@ et.testSet({
             equals:  [et.eth('5').mul(et.BN(A_DAY)).mul(et.eth('1')).div(14 * A_DAY).mul(et.eth('1')).div(et.eth('5')).div(et.eth('1')), 1e-4]
         },
 
-        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
+        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', },
         { call: 'stakingRewards.rewardRate', equals: [et.eth('1').div(14 * A_DAY).mul(13 * A_DAY).add(et.eth('1')).div(14 * A_DAY), 1e-4] },
         { call: 'stakingRewards.getRewardForDuration', equals: [et.eth('1').div(14 * A_DAY).mul(13 * A_DAY).add(et.eth('1')), 1e-4] },
     ]
@@ -275,13 +275,13 @@ et.testSet({
         { from: ctx.wallet3, send: 'eTokens.eTST.approve', args: [ctx.contracts.stakingRewards.address, et.MaxUint256], },
         { from: ctx.wallet3, send: 'stakingRewards.stake', args: [0, et.eth('5')], },
 
-        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
+        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', },
         { action: 'jumpTimeAndMine', time: 14 * A_DAY, },
 
         { call: 'stakingRewards.earned', args: [ctx.wallet3.address], 
         },
 
-        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
+        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', },
         { action: 'jumpTimeAndMine', time: 14 * A_DAY, },
 
         { call: 'stakingRewards.earned', args: [ctx.wallet3.address], 
@@ -294,7 +294,7 @@ et.testSet({
     desc: "gets reward",
     actions: ctx => [
         { from: ctx.wallet3, send: 'eTokens.eTST.approve', args: [ctx.contracts.stakingRewards.address, et.MaxUint256], },
-        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
+        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', },
         
         { call: 'tokens.TST.balanceOf', args: [ctx.wallet3.address], assertEql: 0 },
         { call: 'tokens.TST.balanceOf', args: [ctx.contracts.stakingRewards.address], assertEql: et.eth('1') },
@@ -356,7 +356,7 @@ et.testSet({
     desc: "exit",
     actions: ctx => [
         { from: ctx.wallet3, send: 'eTokens.eTST.approve', args: [ctx.contracts.stakingRewards.address, et.MaxUint256], },
-        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
+        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', },
         { from: ctx.wallet3, send: 'stakingRewards.exit', args:[0], expectError: 'Cannot withdraw 0' },
 
         { from: ctx.wallet3, send: 'stakingRewards.stake', args: [0, et.eth('5')], },
@@ -404,7 +404,7 @@ et.testSet({
         },
         { call: 'stakingRewards.rewardsDuration', assertEql: 3 * A_DAY },
 
-        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
+        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', },
         { send: 'stakingRewards.setRewardsDuration', args: [A_DAY], 
             expectError: "Previous rewards period must be complete before changing the duration for the new period" 
         },
@@ -470,7 +470,7 @@ et.testSet({
         { from: ctx.wallet3, send: 'stakingRewards.stake', args: [0, et.eth('1')], },
         { from: ctx.wallet4, send: 'stakingRewards.stake', args: [0, et.eth('1')], },
 
-        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
+        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', },
         
         // they should earn the same amount
         { action: 'jumpTimeAndMine', time: A_DAY, },
@@ -493,12 +493,12 @@ et.testSet({
 
         // first wallet leaves, new period begins
         { from: ctx.wallet3, send: 'stakingRewards.exit', args:[0], },
-        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
+        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', },
         { action: 'jumpTimeAndMine', time: 10 * A_DAY, },
 
         // second wallet gets rewards, new period begins
         { from: ctx.wallet4, send: 'stakingRewards.getReward', },
-        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
+        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', },
         
         { action: 'jumpTimeAndMine', time: 10 * A_DAY, },
         { from: ctx.wallet4, send: 'stakingRewards.exit', args:[0], },
@@ -539,7 +539,7 @@ et.testSet({
         { from: ctx.wallet3, send: 'stakingRewards.stake', args: [1, et.eth('1')], },
         { from: ctx.wallet4, send: 'stakingRewards.stake', args: [2, et.eth('1')], },
 
-        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
+        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', },
         
         // they should earn the same amount
         { action: 'jumpTimeAndMine', time: A_DAY, },
@@ -562,12 +562,12 @@ et.testSet({
 
         // first wallet leaves, new period begins
         { from: ctx.wallet3, send: 'stakingRewards.exit', args:[0], },
-        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
+        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', },
         { action: 'jumpTimeAndMine', time: 10 * A_DAY, },
 
         // second wallet gets rewards, new period begins
         { from: ctx.wallet4, send: 'stakingRewards.getReward', },
-        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', args: [et.eth('1')], },
+        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', },
         
         { action: 'jumpTimeAndMine', time: 10 * A_DAY, },
         { from: ctx.wallet4, send: 'stakingRewards.exit', args:[1], },

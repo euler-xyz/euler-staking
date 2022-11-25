@@ -113,18 +113,17 @@ contract RewardsDistribution is Owned, IRewardsDistribution {
         return true;
     }
 
-    function distributeRewards(uint amount) external override returns (bool) {
-        require(amount > 0, "Nothing to distribute");
+    function distributeRewards() external override returns (bool) {
         require(msg.sender == authority, "Caller is not authorised");
         require(rewardsToken != address(0), "RewardsToken is not set");
-        require(
-            IERC20(rewardsToken).balanceOf(address(this)) >= amount,
-            "RewardsDistribution contract does not have enough tokens to distribute"
-        );
+
+        uint amount = 0;
 
         // Iterate the array of distributions sending the configured amounts
         for (uint i = 0; i < distributions.length; i++) {
             if (distributions[i].destination != address(0) && distributions[i].amount != 0) {
+                amount += distributions[i].amount;
+                
                 // Transfer the rewards token
                 IERC20(rewardsToken).transfer(distributions[i].destination, distributions[i].amount);
 
@@ -139,6 +138,8 @@ contract RewardsDistribution is Owned, IRewardsDistribution {
                 }
             }
         }
+
+        require(amount > 0, "Nothing to distribute");
 
         emit RewardsDistributed(amount);
         return true;
