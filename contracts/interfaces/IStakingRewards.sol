@@ -21,11 +21,14 @@ interface IStakingRewards {
 
     // Mutative
 
+    function exit() external;
     function exit(uint subAccountId) external;
 
     function getReward() external;
 
+    function stake(uint256 amount) external;
     function stake(uint subAccountId, uint256 amount) external;
 
+    function withdraw(uint256 amount) external;
     function withdraw(uint subAccountId, uint256 amount) external;
 }

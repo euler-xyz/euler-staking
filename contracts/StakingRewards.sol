@@ -16,8 +16,8 @@ import "./Utils.sol";
 contract StakingRewards is IStakingRewards, RewardsDistributionRecipient, ReentrancyGuard, Pausable {
     /* ========== STATE VARIABLES ========== */
     
-    address public rewardsToken;
-    address public stakingToken;
+    address immutable public rewardsToken;
+    address immutable public stakingToken;
     uint256 public periodFinish = 0;
     uint256 public rewardRate = 0;
     uint256 public rewardsDuration = 14 days;
@@ -74,7 +74,7 @@ contract StakingRewards is IStakingRewards, RewardsDistributionRecipient, Reentr
 
     /* ========== MUTATIVE FUNCTIONS ========== */
 
-    function stake(uint subAccountId, uint256 amount) external override nonReentrant notPaused updateReward(msg.sender) {
+    function stake(uint subAccountId, uint256 amount) public override nonReentrant notPaused updateReward(msg.sender) {
         require(amount > 0, "Cannot stake 0");
 
         address from = Utils.getSubAccount(msg.sender, subAccountId);
@@ -105,9 +105,21 @@ contract StakingRewards is IStakingRewards, RewardsDistributionRecipient, Reentr
         }
     }
 
-    function exit(uint subAccountId) external override {
+    function exit(uint subAccountId) public override {
         withdraw(subAccountId, _balances[msg.sender]);
         getReward();
+    }
+
+    function stake(uint256 amount) external override {
+        stake(0, amount);
+    }
+
+    function withdraw(uint256 amount) public override {
+        withdraw(0, amount);
+    }
+
+    function exit() external override {
+        exit(0);
     }
 
     /* ========== RESTRICTED FUNCTIONS ========== */
