@@ -1,6 +1,6 @@
 {
     "rewardsDistribution": "0x8d34C45ADd24c86f625f4a6e8B5325b7e9AE37Ea",
-    "stakingRewards_eUSDC": "0xb74AfB2663D9d60257267B4Fb949Bc2652F339a5",
-    "stakingRewards_eUSDT": "0x1b6664ac6797A9B9E1DfB8941aDEed7daE079c4d",
-    "stakingRewards_eWBTC": "0x91f6677dF9e99c60E44145111f995d92A0481656"
+    "stakingRewards_eUSDC": "0x77E760793C49AD24324F186f2C368c1328c33b93",
+    "stakingRewards_eUSDT": "0xb7193D983C29c9bC41DdA34cdD239f86761F46ee",
+    "stakingRewards_eWBTC": "0x12a8eC91B13b127d342f54c7e67128F807A2ABed"
 }
