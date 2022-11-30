@@ -6,13 +6,17 @@ et.testSet({
     desc: "RewardsDistribution",
     preActions: ctx => [
         { action: 'cb', cb: async () => {
-            const factory = await ethers.getContractFactory('RewardsDistribution');
+            let factory = await ethers.getContractFactory('RewardsDistribution');
 
             ctx.contracts.rewardsDistribution = await (await factory.deploy(
                 ctx.wallet.address,
                 ctx.wallet2.address,
                 ctx.contracts.tokens.TST.address,
             )).deployed();
+
+            factory = await ethers.getContractFactory('MockStakingRewards');
+            ctx.contracts.mockStakingRewards = await (await factory.deploy()).deployed();
+            ctx.contracts.mockStakingRewards2 = await (await factory.deploy()).deployed();
         }},
         { send: 'tokens.TST.mint', args: [ctx.wallet.address, et.eth('100')], },
     ],
@@ -203,7 +207,7 @@ et.testSet({
 .test({
     desc: "should revert when non authority attempts to distributeRewards",
     actions: ctx => [
-        { send: 'rewardsDistribution.addRewardDistribution', args: [ctx.wallet.address, et.eth('1')], },
+        { send: 'rewardsDistribution.addRewardDistribution', args: [ctx.contracts.mockStakingRewards.address, et.eth('1')], },
         { send: 'rewardsDistribution.distributeRewards', expectError: "Caller is not authorised"},
     ]
 })
@@ -218,7 +222,7 @@ et.testSet({
 .test({
     desc: "should revert when contract does not have the token balance to distribute",
     actions: ctx => [
-        { send: 'rewardsDistribution.addRewardDistribution', args: [ctx.wallet.address, et.eth('1')], },
+        { send: 'rewardsDistribution.addRewardDistribution', args: [ctx.contracts.mockStakingRewards.address, et.eth('1')], },
         { send: 'tokens.TST.transfer', args: [ctx.contracts.rewardsDistribution.address, et.eth('1').sub(1)], },
         { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', expectError: "ERC20: transfer amount exceeds balance"},
     ]
@@ -227,17 +231,29 @@ et.testSet({
 .test({
     desc: "should revert when rewards token is not set",
     actions: ctx => [
-        { send: 'rewardsDistribution.addRewardDistribution', args: [ctx.wallet.address, et.eth('1')], },
+        { send: 'rewardsDistribution.addRewardDistribution', args: [ctx.contracts.mockStakingRewards.address, et.eth('1')], },
         { send: 'rewardsDistribution.setRewardToken', args: [et.AddressZero], },
         { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', expectError: "RewardsToken is not set"},
     ]
 })
 
 .test({
+    desc: "should revert when staking contract does not implement RewardsDistributionRecipient",
+    actions: ctx => [
+        { send: 'mockStakingRewards2.setShouldRevert', args: [true], },
+        { send: 'rewardsDistribution.addRewardDistribution', args: [ctx.contracts.mockStakingRewards.address, et.eth('1')], },
+        { send: 'rewardsDistribution.addRewardDistribution', args: [ctx.contracts.mockStakingRewards2.address, et.eth('2')], },
+        { send: 'tokens.TST.transfer', args: [ctx.contracts.rewardsDistribution.address, et.eth('3')], },
+        
+        { from: ctx.wallet2, send: 'rewardsDistribution.distributeRewards', expectError: "Rewards distribution unsuccessful"},
+    ]
+})
+
+.test({
     desc: "should send the correct amount of tokens to the listed addresses",
     actions: ctx => [
-        { send: 'rewardsDistribution.addRewardDistribution', args: [ctx.wallet4.address, et.eth('1')], },
-        { send: 'rewardsDistribution.addRewardDistribution', args: [ctx.wallet5.address, et.eth('2')], },
+        { send: 'rewardsDistribution.addRewardDistribution', args: [ctx.contracts.mockStakingRewards.address, et.eth('1')], },
+        { send: 'rewardsDistribution.addRewardDistribution', args: [ctx.contracts.mockStakingRewards2.address, et.eth('2')], },
 
         { send: 'tokens.TST.transfer', args: [ctx.contracts.rewardsDistribution.address, et.eth('3')], },
         { call: 'tokens.TST.balanceOf', args: [ctx.contracts.rewardsDistribution.address], assertEql: et.eth('3') },
@@ -248,8 +264,8 @@ et.testSet({
                 et.expect(logs[0].args.amount).to.equal(et.eth('3'));
             },
         },
-        { call: 'tokens.TST.balanceOf', args: [ctx.wallet4.address], assertEql: et.eth('1') },
-        { call: 'tokens.TST.balanceOf', args: [ctx.wallet5.address], assertEql: et.eth('2') },
+        { call: 'tokens.TST.balanceOf', args: [ctx.contracts.mockStakingRewards.address], assertEql: et.eth('1') },
+        { call: 'tokens.TST.balanceOf', args: [ctx.contracts.mockStakingRewards2.address], assertEql: et.eth('2') },
         { call: 'tokens.TST.balanceOf', args: [ctx.contracts.rewardsDistribution.address], assertEql: et.eth('0') },
     ]
 })

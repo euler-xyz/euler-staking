@@ -127,15 +127,13 @@ contract RewardsDistribution is Owned, IRewardsDistribution {
                 // Transfer the rewards token
                 IERC20(rewardsToken).transfer(distributions[i].destination, distributions[i].amount);
 
-                // If the contract implements RewardsDistributionRecipient.sol, inform it how much rewards tokens is received.
+                // Inform staking contract how much rewards tokens is received
                 bytes memory payload = abi.encodeWithSignature("notifyRewardAmount(uint256)", distributions[i].amount);
 
                 // solhint-disable avoid-low-level-calls
                 (bool success, ) = distributions[i].destination.call(payload);
 
-                if (!success) {
-                    // Note: we're ignoring the return value as it will fail for contracts that do not implement RewardsDistributionRecipient.sol
-                }
+                require(success, "Rewards distribution unsuccessful");
             }
         }
 
