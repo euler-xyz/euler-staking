@@ -1,5 +1,8 @@
 const child_process = require("child_process");
-const ABI = require("../artifacts/contracts/RewardsDistribution.sol/RewardsDistribution.json").abi;
+const ABI = [
+    "function addRewardDistribution(address, uint) returns (bool)",
+    "function distributeRewards() returns (bool)"
+]
 
 task("distribution:add")
     .addPositionalParam("distributor")
